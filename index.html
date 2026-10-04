@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Sabi is a personalised WASSCE revision and readiness platform for students across WAEC member countries.">
+<meta name="theme-color" content="#123f31">
+<meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Sabi — Personalised WASSCE Readiness</title>
+<style>
+:root{
+  --bg:#f6f1e8; --ink:#10251d; --muted:#68766f; --card:#fffdf9; --line:#ddd7cc;
+  --green:#123f31; --green2:#1d5a45; --gold:#d6ad56; --clay:#b66042; --soft:#e9efe9;
+  --danger:#a23e2a; --white:#ffffff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+button,select,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #d6ad56;outline-offset:2px}
+.skip-link{position:absolute;left:-9999px;top:8px;background:#fff;color:#10251d;padding:10px 14px;border-radius:10px;z-index:999}
+.skip-link:focus{left:8px}
+.beta-banner{background:#123f31;color:#fff;text-align:center;padding:8px 14px;font-size:.82rem}
+.modal-backdrop{position:fixed;inset:0;background:rgba(10,20,16,.66);z-index:1000;display:grid;place-items:center;padding:16px}
+.modal{width:min(680px,100%);max-height:90vh;overflow:auto;background:#fffdf9;border-radius:22px;border:1px solid #ddd7cc;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.28)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input,textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #ddd7cc;background:#fff;color:#10251d}
+textarea{min-height:120px;resize:vertical}
+.toast{position:fixed;right:18px;bottom:18px;background:#10251d;color:#fff;padding:12px 15px;border-radius:12px;z-index:1100;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.utility{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.utility button{font-size:.78rem}
+.shell{max-width:1180px;margin:auto;padding:0 20px 44px}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(246,241,232,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topinner{max-width:1180px;margin:auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.15rem}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:900}
+.nav{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.nav button{font-size:.88rem}
+.nav button{border:0;background:transparent;color:var(--muted);padding:8px 10px;border-radius:9px}
+.nav button.active{background:var(--green);color:white}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:22px;padding:34px 0 18px}
+.hero h1{font-size:clamp(2.2rem,5vw,4.7rem);line-height:.95;letter-spacing:-.05em;margin:0 0 18px}
+.hero p{font-size:1.08rem;line-height:1.65;color:var(--muted);max-width:720px}
+.kicker{text-transform:uppercase;letter-spacing:.13em;font-weight:800;font-size:.76rem;color:var(--green2);margin-bottom:12px}
+.heroCard,.card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 10px 28px rgba(32,44,35,.06)}
+.heroCard{padding:20px}
+.scoreRing{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;margin:auto;background:conic-gradient(var(--green) 0 68%, #e6e0d5 68%)}
+.scoreRing div{width:116px;height:116px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center}
+.scoreRing strong{font-size:2rem}
+.small{font-size:.83rem;color:var(--muted)}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.pill{background:#edf1eb;border:1px solid #dce4dc;border-radius:999px;padding:6px 10px;font-size:.82rem}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{padding:18px}
+.span8{grid-column:span 8}.span4{grid-column:span 4}.span6{grid-column:span 6}.span12{grid-column:span 12}
+.card h2,.card h3{margin-top:0}
+.subjects{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.subject{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;cursor:pointer;transition:.18s}
+.subject:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(32,44,35,.07)}
+.subject strong{display:block;margin-bottom:8px}
+.bar{height:8px;background:#ece6dc;border-radius:999px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--green);border-radius:999px}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+label{display:block;font-size:.78rem;font-weight:800;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:white}
+.primary{border:0;background:var(--green);color:white;border-radius:12px;padding:11px 14px;font-weight:800}
+.secondary{border:1px solid var(--line);background:white;color:var(--ink);border-radius:12px;padding:11px 14px;font-weight:800}
+.danger{background:var(--danger)}
+.option{display:block;width:100%;text-align:left;border:1px solid var(--line);background:white;border-radius:14px;padding:13px 14px;margin:9px 0}
+.option:hover{border-color:#a8b6ae}
+.option.correct{border-color:#2f7a59;background:#edf8f1}
+.option.wrong{border-color:#bd6a55;background:#fff0eb}
+.hidden{display:none!important}
+.examTop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.timer{font-weight:900;background:#fff4d8;border:1px solid #ead39d;border-radius:999px;padding:7px 11px}
+.qnum{color:var(--muted);font-weight:700}
+.question{font-size:1.2rem;line-height:1.5;font-weight:800;margin:14px 0}
+.feedback{border-left:4px solid var(--gold);padding:12px 14px;background:#fff8e7;border-radius:10px;margin:14px 0}
+.badge{display:inline-block;border-radius:999px;background:#edf0eb;padding:5px 9px;font-size:.78rem;font-weight:800}
+.mastery-list{display:grid;gap:10px}
+.mastery{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:10px}
+.mastery:last-child{border-bottom:0}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px}
+.green{background:#3e8561}.gold{background:#d6ad56}.clay{background:#b66042}.grey{background:#b8b8b2}
+.resultHero{display:flex;align-items:flex-end;gap:16px;margin-bottom:20px}
+.grade{font-size:4.5rem;font-weight:950;line-height:1;color:var(--green)}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{background:#f3efe7;border-radius:14px;padding:13px}
+.stat strong{font-size:1.35rem;display:block}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:.92rem}
+.notice{padding:13px 15px;border-radius:14px;background:#f4ead3;border:1px solid #e5cf9c;color:#5d4a1d}
+.footer{margin-top:26px;color:var(--muted);font-size:.85rem;line-height:1.6}
+a{color:var(--green2)}
+@media(max-width:800px){
+  .hero{grid-template-columns:1fr}.span8,.span4,.span6,.span12{grid-column:span 12}
+  .subjects{grid-template-columns:1fr 1fr}.controls{grid-template-columns:1fr 1fr}.nav{display:none}
+}
+@media(max-width:620px){
+  .card .row > div[style*='grid-template-columns:repeat(4']{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:520px){
+  .subjects,.controls,.statgrid{grid-template-columns:1fr}.shell{padding:0 14px 30px}.topinner{padding:12px 14px}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#mainContent">Skip to main content</a>
+<div class="beta-banner">Sabi Public Beta • Original exam-style questions • Your progress is stored on this device</div>
+<div class="topbar">
+  <div class="topinner">
+    <div class="brand"><div class="mark">S</div><div>Sabi<div style="font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.02em">WASSCE READINESS</div></div></div>
+    <div class="nav">
+      <button class="active" onclick="showView('desk',this)">Dashboard</button>
+      <button onclick="showView('learn',this)">Learn</button>
+      <button onclick="showView('practice',this)">Practice</button>
+      <button onclick="showView('mocks',this)">Mock exams</button>
+      <button onclick="showView('skills',this)">Skills</button>
+      <button onclick="showView('analytics',this)">Analytics</button>
+      <button onclick="showView('planner',this)">Planner</button>
+      <button onclick="showView('schools',this)">Schools</button>
+    </div>
+    <div class="utility">
+      <button class="secondary" onclick="openFeedback()">Feedback</button>
+      <button class="secondary" onclick="openSettings()">Profile</button>
+    </div>
+  </div>
+</div>
+
+<main class="shell" id="mainContent">
+<section id="deskView">
+  <div class="hero">
+    <div>
+      <div class="kicker">WASSCE readiness, not another PDF pile</div><div id="welcomeName" class="small" style="margin-bottom:8px"></div>
+      <h1>Know exactly what to fix before WASSCE.</h1>
+      <p>Sabi turns practice into a personalised exam plan. Sit realistic WASSCE-style papers, see exactly where marks are leaking, repair the weak topics, and retest until they stay strong.</p>
+      <div class="pills"><span class="pill">5 WAEC countries</span><span class="pill">6 launch subjects</span><span class="pill">Diagnostic engine</span><span class="pill">Teacher analytics</span></div>
+    </div>
+    <div class="heroCard">
+      <div class="scoreRing"><div><span class="small">READINESS</span><strong id="heroReadiness">68%</strong></div></div>
+      <h3 style="margin-bottom:6px">Your next best move</h3>
+      <p class="small" id="nextMove">Take a Mathematics diagnostic to identify your highest-value repair topic.</p>
+      <button class="primary" style="width:100%" onclick="quickStart()">Start diagnostic</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="row" style="align-items:flex-start;gap:18px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div class="kicker">How Sabi works</div>
+        <h2 style="margin-bottom:8px">Test → Diagnose → Repair → Retest</h2>
+        <p class="small" style="font-size:.95rem;line-height:1.6">
+          Every answer updates a live picture of your syllabus mastery. Sabi prioritises the topics most likely to raise your grade,
+          so revision time goes where it matters most.
+        </p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:8px;flex:1.3;min-width:300px">
+        <div class="stat"><span class="small">1. TEST</span><strong>Diagnostic</strong></div>
+        <div class="stat"><span class="small">2. FIND</span><strong>Mark leaks</strong></div>
+        <div class="stat"><span class="small">3. FIX</span><strong>Weak topics</strong></div>
+        <div class="stat"><span class="small">4. PROVE</span><strong>Retest</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card span8">
+      <div class="row"><div><div class="kicker">Your subjects</div><h2>WASSCE readiness</h2></div><span class="badge">Demo profile</span></div>
+      <div class="subjects" id="subjectCards"></div>
+    </div>
+    <div class="card span4">
+      <div class="kicker">Today</div><h2>Revision queue</h2>
+      <div id="todayQueue"></div>
+      <button class="secondary" style="width:100%;margin-top:10px" onclick="showView('practice')">Open practice desk</button>
+    </div>
+    <div class="card span12 notice">
+      <strong>Copyright-safe prototype:</strong> the questions here are original exam-style samples. It does not reproduce WAEC past papers or marking schemes.
+    </div>
+  </div>
+</section>
+
+
+<section id="learnView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr">
+    <div>
+      <div class="kicker">Learn</div>
+      <h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">Short lessons. Straight to the marks.</h1>
+      <p>Use Sabi when you do not understand a topic yet — not only when you want another test. Each lesson ends with a quick check before the topic returns to your revision queue.</p>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card span8">
+      <div class="row"><div><div class="kicker">Recommended next</div><h2>Based on your current weak areas</h2></div><span class="badge">Personalised</span></div>
+      <div class="subjects">
+        <div class="subject"><strong>Economics • Demand</strong><div class="small">Elasticity, shifts vs movements, exam traps</div><div class="bar" style="margin-top:10px"><span style="width:35%"></span></div></div>
+        <div class="subject"><strong>Physics • Mechanics</strong><div class="small">Speed, velocity, acceleration, force</div><div class="bar" style="margin-top:10px"><span style="width:48%"></span></div></div>
+        <div class="subject"><strong>Maths • Algebra</strong><div class="small">Rearranging, substitution, simultaneous equations</div><div class="bar" style="margin-top:10px"><span style="width:56%"></span></div></div>
+      </div>
+    </div>
+    <div class="card span4">
+      <div class="kicker">Micro lesson</div>
+      <h2>Shifts vs movements</h2>
+      <p class="small" style="line-height:1.7">A change in the good's own price causes a <strong>movement along</strong> the demand curve. A non-price determinant such as income, tastes or the price of a substitute can <strong>shift</strong> the curve.</p>
+      <div class="notice"><strong>Exam trap:</strong> do not say “demand increases” when you mean “quantity demanded increases.”</div>
+      <button class="primary" style="width:100%;margin-top:12px" onclick="subjectStart('Economics')">Check me with 5 questions</button>
+    </div>
+    <div class="card span12">
+      <h2>Course library</h2>
+      <table class="table">
+        <tr><th>Subject</th><th>Current unit</th><th>Mastery</th><th>Action</th></tr>
+        <tr><td>Mathematics</td><td>Algebra & number</td><td>62%</td><td><button class="secondary" onclick="subjectStart('Mathematics')">Continue</button></td></tr>
+        <tr><td>English Language</td><td>Summary & comprehension</td><td>66%</td><td><button class="secondary" onclick="subjectStart('English Language')">Continue</button></td></tr>
+        <tr><td>Biology</td><td>Genetics</td><td>78%</td><td><button class="secondary" onclick="subjectStart('Biology')">Review</button></td></tr>
+        <tr><td>Chemistry</td><td>Moles & electrolysis</td><td>71%</td><td><button class="secondary" onclick="subjectStart('Chemistry')">Continue</button></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="mocksView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr">
+    <div><div class="kicker">Mock exams</div><h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">Train the exam, not just the topic.</h1>
+    <p>Mocks are separated from ordinary practice so students know when they are testing performance under pressure rather than learning with support.</p></div>
+  </div>
+  <div class="grid">
+    <div class="card span8">
+      <div class="row"><div><div class="kicker">Recommended</div><h2>Next mock</h2></div><span class="badge">Exam conditions</span></div>
+      <h3>Mathematics • Paper 1 mini mock</h3>
+      <p class="small">10 mixed questions • timed • no hints • results at the end • review after submission</p>
+      <div class="statgrid" style="margin:16px 0">
+        <div class="stat"><span class="small">QUESTIONS</span><strong>10</strong></div>
+        <div class="stat"><span class="small">TIME</span><strong>12 min</strong></div>
+        <div class="stat"><span class="small">LAST SCORE</span><strong>60%</strong></div>
+        <div class="stat"><span class="small">TARGET</span><strong>75%</strong></div>
+      </div>
+      <button class="primary" onclick="startMock('Mathematics')">Start mock</button>
+    </div>
+    <div class="card span4">
+      <div class="kicker">Mock discipline</div><h2>Make practice count</h2>
+      <p class="small" style="line-height:1.7">No hints. No pausing. No instant answer reveal. Sabi records both accuracy and pace so a correct answer that took far too long is still useful diagnostic evidence.</p>
+    </div>
+    <div class="card span12">
+      <div class="row"><div><div class="kicker">Build your own</div><h2>Smart mini-mock builder</h2></div><span class="badge">Personalised</span></div>
+      <p class="small">Choose what the paper should optimise for. In the full product, Sabi would use your study history to recommend the mix automatically.</p>
+      <div class="controls" style="grid-template-columns:repeat(4,1fr);margin-top:12px">
+        <div><label>Focus</label><select id="mockFocus"><option>Recommended topics</option><option>Wrong answers only</option><option>Hard questions</option><option>Calculations only</option></select></div>
+        <div><label>Subject</label><select id="mockSubject"><option>Mathematics</option><option>English Language</option><option>Biology</option><option>Chemistry</option><option>Physics</option><option>Economics</option></select></div>
+        <div><label>Length</label><select id="mockLength"><option>10 questions</option><option>20 questions</option><option>30 questions</option></select></div>
+        <div style="display:flex;align-items:end"><button class="primary" style="width:100%" onclick="buildSmartMock()">Generate mock</button></div>
+      </div>
+      <div id="mockBuilderResult" class="notice hidden" style="margin-top:12px"></div>
+    </div>
+    <div class="card span12">
+      <h2>Mock library</h2>
+      <table class="table">
+        <tr><th>Paper</th><th>Type</th><th>Status</th><th>Best</th><th></th></tr>
+        <tr><td>Mathematics Paper 1</td><td>Mini mock</td><td>Ready</td><td>60%</td><td><button class="secondary" onclick="startMock('Mathematics')">Sit</button></td></tr>
+        <tr><td>English Language Objective</td><td>Mini mock</td><td>Ready</td><td>—</td><td><button class="secondary" onclick="startMock('English Language')">Sit</button></td></tr>
+        <tr><td>Biology Objective</td><td>Mini mock</td><td>Ready</td><td>80%</td><td><button class="secondary" onclick="startMock('Biology')">Sit</button></td></tr>
+        <tr><td>Chemistry Objective</td><td>Mini mock</td><td>Ready</td><td>70%</td><td><button class="secondary" onclick="startMock('Chemistry')">Sit</button></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="skillsView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr">
+    <div><div class="kicker">Skill trainers</div><h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">Train the thing underneath the topic.</h1>
+    <p>Some students do not have a knowledge problem. They have a speed, interpretation or exam-technique problem. Skill trainers isolate those abilities.</p></div>
+  </div>
+  <div class="subjects">
+    <div class="subject"><strong>⚡ Calculation speed</strong><div class="small">Mental arithmetic, units, rearranging formulae</div><p><span class="badge">2 min drills</span></p></div>
+    <div class="subject"><strong>📊 Graph reading</strong><div class="small">Axes, gradients, trends, anomalies and data response</div><p><span class="badge">Science + Economics</span></p></div>
+    <div class="subject"><strong>✍️ Summary extraction</strong><div class="small">Find scoring points without copying or repetition</div><p><span class="badge">English</span></p></div>
+    <div class="subject"><strong>🧪 Practical reasoning</strong><div class="small">Variables, errors, controls and conclusions</div><p><span class="badge">Sciences</span></p></div>
+    <div class="subject"><strong>⏱️ Pace trainer</strong><div class="small">Answer accurately inside a target time per item</div><p><span class="badge">All subjects</span></p></div>
+    <div class="subject"><strong>🎯 Command words</strong><div class="small">State, explain, compare, calculate, evaluate</div><p><span class="badge">Theory papers</span></p></div>
+  </div>
+</section>
+
+<section id="analyticsView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr">
+    <div><div class="kicker">Analytics</div><h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">Accuracy tells only half the story.</h1>
+    <p>Sabi separates what you know from how efficiently and consistently you can produce it under exam conditions.</p></div>
+  </div>
+  <div class="grid">
+    <div class="card span4"><span class="small">OVERALL ACCURACY</span><h2 style="font-size:2.4rem">68%</h2><div class="bar"><span style="width:68%"></span></div><p class="small">+6 points over recent sittings</p></div>
+    <div class="card span4"><span class="small">PACE</span><h2 style="font-size:2.4rem">74%</h2><div class="bar"><span style="width:74%"></span></div><p class="small">Mostly on target; algebra is slow</p></div>
+    <div class="card span4"><span class="small">CONSISTENCY</span><h2 style="font-size:2.4rem">61%</h2><div class="bar"><span style="width:61%"></span></div><p class="small">Scores vary under time pressure</p></div>
+
+    <div class="card span8">
+      <div class="row"><h2>Topic diagnostics</h2><span class="badge">Accuracy + pace</span></div>
+      <table class="table">
+        <tr><th>Topic</th><th>Accuracy</th><th>Pace</th><th>Diagnosis</th></tr>
+        <tr><td>Algebra</td><td>58%</td><td>Slow</td><td><strong>Repair + speed</strong></td></tr>
+        <tr><td>Geometry</td><td>78%</td><td>On target</td><td>Maintain</td></tr>
+        <tr><td>Genetics</td><td>64%</td><td>On target</td><td>Knowledge gap</td></tr>
+        <tr><td>Electrolysis</td><td>70%</td><td>Slow</td><td>Fluency issue</td></tr>
+        <tr><td>Summary</td><td>55%</td><td>Fast</td><td>Accuracy issue</td></tr>
+      </table>
+    </div>
+    <div class="card span4">
+      <div class="kicker">Sabi insight</div><h2>Do not revise everything equally.</h2>
+      <p class="small" style="line-height:1.7">Your biggest immediate return is Algebra: accuracy is below target and your average pace is also slow. Summary writing is inaccurate but already fast, so the intervention should focus on method rather than speed.</p>
+      <button class="primary" style="width:100%" onclick="subjectStart('Mathematics')">Repair Algebra</button>
+    </div>
+  </div>
+</section>
+
+<section id="practiceView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr">
+    <div><div class="kicker">Practice desk</div><h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">Sit it like the exam. Learn from every miss.</h1></div>
+  </div>
+  <div class="grid" style="margin-bottom:14px">
+    <div class="card span8">
+      <div class="row"><div><div class="kicker">Smart practice</div><h2>Your wrong answers become tomorrow's questions.</h2></div><span class="badge">Adaptive</span></div>
+      <p class="small">Sabi remembers recurring mistakes by topic and question type. When the same misconception appears twice, it moves into your repair queue rather than disappearing inside a percentage score.</p>
+    </div>
+    <div class="card span4">
+      <span class="small">CURRENT REPAIR QUEUE</span>
+      <h2 style="margin:6px 0">7 questions</h2>
+      <p class="small">Algebra • Demand • Summary writing</p>
+      <button class="primary" style="width:100%" onclick="startWrongAnswers()">Practise wrong answers</button>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="grid" style="gap:10px">
+      <div class="span6">
+        <div class="kicker">Choose how you practise</div>
+        <h2 style="margin-bottom:6px">Four modes for four different jobs</h2>
+      </div>
+      <div class="span6 small" style="line-height:1.7">
+        <strong>Diagnostic</strong> finds gaps. <strong>Exam conditions</strong> tests performance under pressure.
+        <strong>Learning mode</strong> explains every answer. <strong>Fix my weaknesses</strong> builds a paper from your own mistakes.
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="controls">
+      <div><label>Country</label><select id="country">
+        <option>Sierra Leone</option><option>Ghana</option><option>Nigeria</option><option>The Gambia</option><option>Liberia</option>
+      </select></div>
+      <div><label>Subject</label><select id="subject"></select></div>
+      <div><label>Mode</label><select id="mode">
+        <option value="diagnostic">Diagnostic</option><option value="exam">Exam conditions</option><option value="learning">Learning mode</option><option value="weak">Fix my weaknesses</option>
+      </select></div>
+      <div><label>Length</label><select id="length"><option value="5">5 questions</option><option value="10">10 questions</option></select></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <div class="small" id="countryNote"></div>
+      <button class="primary" onclick="startExam()">Start sitting</button>
+    </div>
+  </div>
+  <div id="examCard" class="card hidden">
+    <div class="examTop"><span class="qnum" id="examMeta"></span><span class="timer" id="timer">Untimed</span></div>
+    <div class="bar"><span id="progressBar" style="width:0%"></span></div>
+    <div id="topicBadge" class="badge" style="margin-top:16px"></div>
+    <div id="questionText" class="question"></div>
+    <div id="options"></div>
+    <div id="feedback" class="feedback hidden"></div>
+    <div class="row" style="margin-top:12px">
+      <div style="display:flex;gap:8px">
+        <button class="secondary" onclick="quitExam()">Quit</button>
+        <button id="flagBtn" class="secondary" onclick="toggleFlag()">☆ Flag</button>
+      </div>
+      <button id="nextBtn" class="primary hidden" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+  <div id="resultCard" class="card hidden" aria-live="polite"></div>
+</section>
+
+<section id="mapView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr"><div><div class="kicker">Knowledge map</div><h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">Turn the syllabus green.</h1><p>Every question contributes evidence about a topic. Green = mastered, brass = developing, clay = weak, grey = not yet tested. In a production version, these scores would be driven by question difficulty, recency, consistency and exam-condition performance rather than a simple percentage.</p></div></div>
+  <div class="grid">
+    <div class="card span6"><h2>Mathematics</h2><div class="mastery-list" id="mathMap"></div></div>
+    <div class="card span6"><h2>Biology</h2><div class="mastery-list" id="bioMap"></div></div>
+  </div>
+</section>
+
+<section id="progressView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr"><div><div class="kicker">Progress</div><h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">Your sittings tell a story.</h1></div></div>
+  <div class="card">
+    <div class="row"><h2>Recent sittings</h2><button class="secondary" onclick="clearProgress()">Clear demo history</button></div>
+    <div id="history"></div>
+  </div>
+</section>
+
+
+<section id="plannerView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr">
+    <div>
+      <div class="kicker">Smart study planner</div>
+      <h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">Know what to do today.</h1>
+      <p>Sabi turns your exam date, target grades and recent performance into a daily revision queue. Weak topics come first, but mastered topics return later for spaced retesting.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card span4">
+      <div class="kicker">Exam countdown</div>
+      <h2 style="font-size:2.4rem;margin-bottom:4px">211 days</h2>
+      <p class="small">Demo countdown to WASSCE</p>
+      <div class="notice"><strong>Current plan:</strong> 35 minutes/day, 6 days/week.</div>
+    </div>
+    <div class="card span8">
+      <div class="row"><div><div class="kicker">Today</div><h2>Your highest-return 35 minutes</h2></div><span class="badge">Auto-prioritised</span></div>
+      <table class="table">
+        <tr><th>Time</th><th>Task</th><th>Why now</th><th></th></tr>
+        <tr><td>10 min</td><td>Economics • Demand repair</td><td>Lowest mastery</td><td><button class="secondary" onclick="subjectStart('Economics')">Start</button></td></tr>
+        <tr><td>10 min</td><td>Maths • Algebra speed drill</td><td>Accuracy + pace issue</td><td><button class="secondary" onclick="subjectStart('Mathematics')">Start</button></td></tr>
+        <tr><td>10 min</td><td>English • Summary extraction</td><td>Recurring error</td><td><button class="secondary" onclick="subjectStart('English Language')">Start</button></td></tr>
+        <tr><td>5 min</td><td>Biology • Genetics retest</td><td>Spaced recall due</td><td><button class="secondary" onclick="subjectStart('Biology')">Start</button></td></tr>
+      </table>
+    </div>
+
+    <div class="card span12">
+      <div class="row"><div><div class="kicker">This week</div><h2>Adaptive revision plan</h2></div><button class="secondary" onclick="rebalancePlan()">Rebalance plan</button></div>
+      <div class="subjects" id="weekPlan">
+        <div class="subject"><strong>Mon</strong><div class="small">Maths repair • English summary • Biology recall</div></div>
+        <div class="subject"><strong>Tue</strong><div class="small">Economics lesson • Chemistry practice • Physics speed</div></div>
+        <div class="subject"><strong>Wed</strong><div class="small">Mathematics mini mock • Review wrong answers</div></div>
+        <div class="subject"><strong>Thu</strong><div class="small">English comprehension • Biology genetics • Chemistry retest</div></div>
+        <div class="subject"><strong>Fri</strong><div class="small">Physics mechanics • Economics demand • wrong-answer drill</div></div>
+        <div class="subject"><strong>Sat</strong><div class="small">Mixed WASSCE mini mock • weekly review</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="schoolsView" class="hidden">
+  <div class="hero" style="grid-template-columns:1fr"><div><div class="kicker">School dashboard concept</div><h1 style="font-size:clamp(2.2rem,4vw,3.7rem)">See the class before results day.</h1><p>This is the commercial layer: teachers see class-level weaknesses before results day, identify students at risk, assign targeted repair work, and track whether the intervention actually improved mastery.</p></div></div>
+  <div class="grid">
+    <div class="card span4"><span class="small">SS3 CHEMISTRY</span><h2>58%</h2><p class="small">Class average</p></div>
+    <div class="card span4"><span class="small">UNDER CREDIT</span><h2>9</h2><p class="small">of 43 students</p></div>
+    <div class="card span4"><span class="small">BIGGEST GAP</span><h2>Electrolysis</h2><p class="small">39% mastery</p></div>
+    <div class="card span12">
+      <div class="row"><div><div class="kicker">Teacher tool</div><h2>Build a class test</h2></div><span class="badge">B2B feature</span></div>
+      <p class="small">Teachers choose a subject, topic and difficulty, then generate a class assignment or printable paper from the approved question bank.</p>
+      <div class="controls">
+        <div><label>Subject</label><select><option>Mathematics</option><option>English Language</option><option>Biology</option><option>Chemistry</option></select></div>
+        <div><label>Topic</label><select><option>Weakest class topics</option><option>Algebra</option><option>Electrolysis</option><option>Genetics</option></select></div>
+        <div><label>Difficulty</label><select><option>Mixed</option><option>Foundation</option><option>Standard</option><option>Challenge</option></select></div>
+        <div style="display:flex;align-items:end"><button class="primary" style="width:100%" onclick="teacherBuild()">Create test</button></div>
+      </div>
+      <div id="teacherBuildResult" class="notice hidden" style="margin-top:12px"></div>
+    </div>
+    <div class="card span12">
+      <h2>Weakest topics</h2>
+      <table class="table"><tr><th>Topic</th><th>Class mastery</th><th>Suggested action</th></tr>
+      <tr><td>Electrolysis</td><td>39%</td><td><button class="secondary">Assign 15-min repair</button></td></tr>
+      <tr><td>Organic chemistry</td><td>45%</td><td><button class="secondary">Assign mini mock</button></td></tr>
+      <tr><td>Stoichiometry</td><td>48%</td><td><button class="secondary">Assign calculation drill</button></td></tr></table>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:22px">
+  <div class="kicker">Public beta roadmap</div>
+  <h2>What we validate during the public beta</h2>
+  <div class="grid">
+    <div class="span4"><div class="stat"><span class="small">PHASE 1</span><strong>Question intelligence</strong><div class="small">Map every question to syllabus topic, subtopic, skill, difficulty and common error.</div></div></div>
+    <div class="span4"><div class="stat"><span class="small">PHASE 2</span><strong>Theory marking</strong><div class="small">English summaries, essays, science structured answers and economics explanations.</div></div></div>
+    <div class="span4"><div class="stat"><span class="small">PHASE 3</span><strong>School accounts</strong><div class="small">Teacher assignments, class heatmaps, at-risk students, test builder and intervention tracking.</div></div></div>
+  </div>
+  <div class="notice" style="margin-top:14px">
+    <strong>Best launch wedge:</strong> combine the strongest patterns from premium exam platforms — syllabus notes, target tests, smart learning, wrong-answer repair, mock builders, planners, skills and analytics — but make the intelligence specifically WASSCE. Start with Sierra Leone + a small set of high-demand subjects, prove that students return and improve,
+    then expand country coverage and school licensing. Do not try to build every subject and every country at once.
+  </div>
+</section>
+
+<div class="footer">
+  Sabi is an independent public-beta prototype and is not affiliated with WAEC. Official WAEC resources should be licensed or linked rather than copied. This beta uses original questions for product testing.
+  <br><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <button class="secondary" style="padding:4px 8px" onclick="exportMyData()">Export my data</button> · <button class="secondary" style="padding:4px 8px" onclick="deleteMyData()">Delete my data</button>
+</div>
+</main>
+
+
+<div id="onboardingModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+  <div class="modal">
+    <div class="kicker">Welcome to Sabi</div>
+    <h2 id="onboardingTitle">Set up your revision desk</h2>
+    <p class="small">Sabi uses these details only on this device to personalise your demo beta experience. You can export or delete them any time.</p>
+    <div class="formgrid">
+      <div><label for="profileName">First name or nickname</label><input id="profileName" maxlength="40" placeholder="e.g. Mariama"></div>
+      <div><label for="profileCountry">WAEC country</label><select id="profileCountry"><option>Sierra Leone</option><option>Ghana</option><option>Nigeria</option><option>The Gambia</option><option>Liberia</option></select></div>
+      <div><label for="profileExamYear">Exam year</label><select id="profileExamYear"><option>2027</option><option>2028</option><option>2029</option></select></div>
+      <div><label for="profileStudyMinutes">Daily study target</label><select id="profileStudyMinutes"><option value="20">20 minutes</option><option value="35" selected>35 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select></div>
+    </div>
+    <div class="notice" style="margin:14px 0">
+      <strong>Beta note:</strong> grades and readiness estimates are indicative only. They are not official WAEC predictions.
+    </div>
+    <label style="text-transform:none;letter-spacing:0;font-weight:600"><input id="profileConsent" type="checkbox" style="width:auto;margin-right:8px">I understand this is a beta revision tool using original practice questions.</label>
+    <div class="row" style="margin-top:16px"><span class="small">No account or email required.</span><button class="primary" onclick="saveOnboarding()">Start using Sabi</button></div>
+  </div>
+</div>
+
+<div id="feedbackModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+  <div class="modal">
+    <div class="row"><div><div class="kicker">Public beta</div><h2 id="feedbackTitle">Send feedback</h2></div><button class="secondary" onclick="closeModal('feedbackModal')">Close</button></div>
+    <p class="small">Tell us what confused you, what felt useful, or what you expected to happen. Feedback is stored on this device and can be exported as a file.</p>
+    <label for="feedbackType">Type</label>
+    <select id="feedbackType"><option>Bug</option><option>Question issue</option><option>Confusing UX</option><option>Feature request</option><option>Something I liked</option></select>
+    <label for="feedbackText" style="margin-top:10px">Feedback</label>
+    <textarea id="feedbackText" placeholder="What happened? What did you expect?"></textarea>
+    <div class="row" style="margin-top:14px"><button class="secondary" onclick="exportFeedback()">Export all feedback</button><button class="primary" onclick="saveFeedback()">Save feedback</button></div>
+  </div>
+</div>
+
+<div id="settingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal">
+    <div class="row"><div><div class="kicker">Profile & data</div><h2 id="settingsTitle">Your Sabi profile</h2></div><button class="secondary" onclick="closeModal('settingsModal')">Close</button></div>
+    <div id="settingsSummary"></div>
+    <div class="row" style="margin-top:14px;justify-content:flex-start;flex-wrap:wrap">
+      <button class="secondary" onclick="resetOnboarding()">Edit profile</button>
+      <button class="secondary" onclick="exportMyData()">Export my data</button>
+      <button class="secondary danger" onclick="deleteMyData()">Delete my data</button>
+    </div>
+  </div>
+</div>
+
+<div id="fatalError" class="modal-backdrop hidden" role="alertdialog" aria-modal="true">
+  <div class="modal">
+    <div class="kicker">Something went wrong</div>
+    <h2>Sabi hit an unexpected error.</h2>
+    <p class="small">Your existing progress should still be saved on this device. Reload the page. If the problem repeats, use Feedback and include what you were doing.</p>
+    <button class="primary" onclick="location.reload()">Reload Sabi</button>
+  </div>
+</div>
+
+<script>
+
+const SABI_VERSION="0.9.0-public-beta";
+function toast(msg){
+ const old=document.querySelector(".toast"); if(old) old.remove();
+ const el=document.createElement("div");el.className="toast";el.textContent=msg;document.body.appendChild(el);
+ setTimeout(()=>el.remove(),2600);
+}
+function safeJson(key,fallback){
+ try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));}catch(e){return fallback;}
+}
+function getProfile(){return safeJson("sabiProfile",null);}
+function applyProfile(){
+ const p=getProfile();
+ if(!p){document.getElementById("onboardingModal").classList.remove("hidden");return;}
+ const wn=document.getElementById("welcomeName");
+ if(wn) wn.textContent=`Welcome back, ${p.name || "student"} • ${p.country} • WASSCE ${p.examYear}`;
+ const c=document.getElementById("country"); if(c && p.country) c.value=p.country;
+}
+function saveOnboarding(){
+ const consent=document.getElementById("profileConsent").checked;
+ if(!consent){toast("Please confirm the beta note first.");return;}
+ const p={
+   name:document.getElementById("profileName").value.trim()||"Student",
+   country:document.getElementById("profileCountry").value,
+   examYear:document.getElementById("profileExamYear").value,
+   studyMinutes:+document.getElementById("profileStudyMinutes").value,
+   createdAt:new Date().toISOString(),
+   version:SABI_VERSION
+ };
+ localStorage.setItem("sabiProfile",JSON.stringify(p));
+ closeModal("onboardingModal"); applyProfile(); toast("Your revision desk is ready.");
+}
+function resetOnboarding(){closeModal("settingsModal");document.getElementById("onboardingModal").classList.remove("hidden");}
+function openFeedback(){document.getElementById("feedbackModal").classList.remove("hidden");}
+function openSettings(){
+ const p=getProfile();
+ document.getElementById("settingsSummary").innerHTML=p?`
+ <div class="statgrid">
+  <div class="stat"><span class="small">NAME</span><strong>${escapeHtml(p.name)}</strong></div>
+  <div class="stat"><span class="small">COUNTRY</span><strong>${escapeHtml(p.country)}</strong></div>
+  <div class="stat"><span class="small">EXAM</span><strong>${escapeHtml(p.examYear)}</strong></div>
+  <div class="stat"><span class="small">DAILY TARGET</span><strong>${p.studyMinutes}m</strong></div>
+ </div>`:`<p>No profile saved yet.</p>`;
+ document.getElementById("settingsModal").classList.remove("hidden");
+}
+function closeModal(id){document.getElementById(id).classList.add("hidden");}
+function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function saveFeedback(){
+ const text=document.getElementById("feedbackText").value.trim();
+ if(!text){toast("Write a little feedback first.");return;}
+ const items=safeJson("sabiFeedback",[]);
+ items.unshift({type:document.getElementById("feedbackType").value,text,at:new Date().toISOString(),version:SABI_VERSION});
+ localStorage.setItem("sabiFeedback",JSON.stringify(items.slice(0,100)));
+ document.getElementById("feedbackText").value="";
+ toast("Feedback saved. Thank you.");
+ closeModal("feedbackModal");
+}
+function downloadJson(filename,obj){
+ const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+function exportFeedback(){downloadJson("sabi-beta-feedback.json",safeJson("sabiFeedback",[]));}
+function exportMyData(){
+ const data={version:SABI_VERSION,exportedAt:new Date().toISOString(),profile:getProfile(),history:safeJson("sabiHistory",[]),feedback:safeJson("sabiFeedback",[])};
+ downloadJson("sabi-my-data.json",data);toast("Data export created.");
+}
+function deleteMyData(){
+ if(!confirm("Delete your Sabi profile, progress and saved feedback from this device?"))return;
+ ["sabiProfile","sabiHistory","sabiFeedback"].forEach(k=>localStorage.removeItem(k));
+ toast("Local Sabi data deleted.");setTimeout(()=>location.reload(),700);
+}
+window.addEventListener("error",e=>{
+ console.error(e.error||e.message);
+ const fatal=document.getElementById("fatalError");
+ if(fatal && !String(e.message||"").includes("ResizeObserver")) fatal.classList.remove("hidden");
+});
+window.addEventListener("unhandledrejection",e=>{console.error(e.reason);});
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+
+const bank = {
+"Mathematics":[
+{t:"Algebra",q:"Solve 3x − 5 = 16.",o:["5","6","7","8"],a:2,e:"Add 5 to both sides to get 3x = 21, then divide by 3."},
+{t:"Number",q:"Evaluate 3/5 + 1/4.",o:["4/9","17/20","7/10","4/20"],a:1,e:"Use denominator 20: 12/20 + 5/20 = 17/20."},
+{t:"Geometry",q:"The angles of a triangle are 48°, 67° and x°. Find x.",o:["55°","65°","75°","85°"],a:1,e:"Angles in a triangle total 180°. x = 180 − 115 = 65°."},
+{t:"Statistics",q:"Find the mean of 5, 8, 8, 9, 10.",o:["7","8","8.5","9"],a:1,e:"The total is 40. Divide by 5 to get 8."},
+{t:"Mensuration",q:"A rectangle is 12 cm by 7 cm. Its area is:",o:["19 cm²","38 cm²","72 cm²","84 cm²"],a:3,e:"Area = length × width = 12 × 7 = 84 cm²."},
+{t:"Algebra",q:"If y = 4x + 1 and x = 3, find y.",o:["7","12","13","15"],a:2,e:"Substitute x = 3: y = 4(3) + 1 = 13."},
+{t:"Ratio",q:"Divide 72 in the ratio 5:3. What is the larger share?",o:["27","40","45","48"],a:2,e:"There are 8 parts. 72 ÷ 8 = 9; 5 parts = 45."},
+{t:"Probability",q:"A fair die is rolled once. Probability of an even number is:",o:["1/6","1/3","1/2","2/3"],a:2,e:"There are 3 even outcomes out of 6: 3/6 = 1/2."},
+{t:"Indices",q:"Simplify 2³ × 2⁴.",o:["2⁷","4⁷","2¹²","4¹²"],a:0,e:"Same base: add powers. 2^(3+4) = 2⁷."},
+{t:"Percentages",q:"Increase 240 by 15%.",o:["255","264","276","288"],a:2,e:"15% of 240 is 36. 240 + 36 = 276."}
+],
+"English Language":[
+{t:"Lexis & Structure",q:"Choose the correct form: Neither of the boys ___ ready.",o:["are","were","is","have been"],a:2,e:"'Neither' is treated as singular here: 'Neither ... is ready.'"},
+{t:"Vocabulary",q:"Choose the word closest in meaning to 'reluctant'.",o:["eager","unwilling","careless","uncertain"],a:1,e:"Reluctant means unwilling or hesitant."},
+{t:"Comprehension",q:"If a writer describes a measure as 'a temporary remedy', the closest meaning is:",o:["a permanent solution","a short-term solution","a dangerous policy","an expensive plan"],a:1,e:"Temporary means intended to last for a limited period."},
+{t:"Grammar",q:"Choose the correct sentence.",o:["She has went home.","She have gone home.","She has gone home.","She gone home."],a:2,e:"The present perfect uses has/have + past participle: has gone."},
+{t:"Summary",q:"In summary writing, the best approach is to:",o:["copy full sentences","use your own words concisely","add extra examples","repeat the introduction"],a:1,e:"A strong summary preserves the key idea while using concise wording, usually in your own words."},
+{t:"Lexis & Structure",q:"Choose the correct preposition: He insisted ___ paying the bill.",o:["at","on","for","with"],a:1,e:"The idiom is 'insist on' doing something."},
+{t:"Vocabulary",q:"An 'inevitable' event is one that:",o:["can easily be avoided","is certain to happen","has already ended","is very unusual"],a:1,e:"Inevitable means unavoidable or certain to happen."},
+{t:"Grammar",q:"Choose the correct option: By next year, she ___ the course.",o:["completes","completed","will have completed","is completing"],a:2,e:"'By next year' points to the future perfect: will have completed."},
+{t:"Comprehension",q:"A writer's 'tone' refers mainly to:",o:["the number of paragraphs","the attitude conveyed","the font used","the title length"],a:1,e:"Tone is the writer's attitude or emotional stance toward the subject or audience."},
+{t:"Summary",q:"Which is most likely to lose marks in a summary?",o:["Concise phrasing","Relevant points","Unnecessary repetition","Clear grammar"],a:2,e:"Repetition wastes words and does not add a distinct scoring point."}
+],
+"Biology":[
+{t:"Cell Biology",q:"Which organelle is the main site of aerobic respiration?",o:["Ribosome","Mitochondrion","Golgi apparatus","Nucleus"],a:1,e:"Most ATP from aerobic respiration is generated in mitochondria."},
+{t:"Genetics",q:"A gene is best described as:",o:["a whole chromosome","a sequence of DNA that influences a product or trait","a type of sugar","an organelle"],a:1,e:"A gene is a DNA sequence carrying information used to make a functional product."},
+{t:"Ecology",q:"A group of organisms of the same species living in one area is a:",o:["community","population","habitat","ecosystem"],a:1,e:"A population is members of one species in a defined area."},
+{t:"Human Physiology",q:"Which vessel carries oxygenated blood from the lungs to the heart?",o:["Pulmonary artery","Aorta","Vena cava","Pulmonary vein"],a:3,e:"The pulmonary vein carries oxygenated blood from lungs to the left atrium."},
+{t:"Plant Biology",q:"The loss of water vapour from leaves is called:",o:["translocation","transpiration","respiration","germination"],a:1,e:"Transpiration is loss of water vapour, mainly through stomata."},
+{t:"Genetics",q:"In a heterozygous genotype Aa, 'A' and 'a' are:",o:["chromatids","alleles","gametes","proteins"],a:1,e:"Alleles are alternative forms of the same gene."},
+{t:"Nutrition",q:"Which enzyme begins starch digestion in the mouth?",o:["Pepsin","Lipase","Amylase","Trypsin"],a:2,e:"Salivary amylase begins hydrolysis of starch."},
+{t:"Cell Biology",q:"Ribosomes are directly involved in:",o:["protein synthesis","lipid storage","DNA replication only","water transport"],a:0,e:"Ribosomes translate mRNA during protein synthesis."},
+{t:"Ecology",q:"Organisms that make organic food from inorganic substances are:",o:["decomposers","consumers","producers","parasites"],a:2,e:"Producers synthesize organic food, commonly by photosynthesis."},
+{t:"Human Physiology",q:"The chamber of the heart with the thickest muscular wall is the:",o:["right atrium","left atrium","right ventricle","left ventricle"],a:3,e:"The left ventricle must generate high pressure for systemic circulation."}
+],
+"Chemistry":[
+{t:"Atomic Structure",q:"The atomic number of an element equals the number of:",o:["neutrons only","protons","nucleons","electron shells"],a:1,e:"Atomic number is defined by proton number."},
+{t:"Bonding",q:"A bond formed by transfer of electrons is primarily:",o:["ionic","covalent","metallic","hydrogen"],a:0,e:"Ionic bonding follows electron transfer and electrostatic attraction between ions."},
+{t:"Acids & Bases",q:"A solution with pH 2 is:",o:["strongly acidic","weakly alkaline","neutral","strongly alkaline"],a:0,e:"A pH well below 7 is acidic."},
+{t:"Moles",q:"How many moles are in 18 g of water, H₂O? (Mr = 18)",o:["0.5","1","2","18"],a:1,e:"Moles = mass ÷ molar mass = 18 ÷ 18 = 1."},
+{t:"Electrolysis",q:"During electrolysis, reduction occurs at the:",o:["anode","cathode","electrolyte only","salt bridge"],a:1,e:"Reduction is gain of electrons and occurs at the cathode."},
+{t:"Periodic Table",q:"Elements in the same group generally have the same number of:",o:["shells","outer-shell electrons","neutrons","isotopes"],a:1,e:"Group chemistry is strongly related to valence electron count."},
+{t:"Rates",q:"Increasing temperature usually increases reaction rate because particles:",o:["become larger","collide less often","have more kinetic energy","lose mass"],a:2,e:"Higher temperature raises kinetic energy and the fraction of successful collisions."},
+{t:"Redox",q:"Oxidation can be defined as:",o:["gain of electrons","loss of electrons","gain of neutrons","loss of protons"],a:1,e:"OIL RIG: Oxidation Is Loss, Reduction Is Gain (of electrons)."},
+{t:"Organic Chemistry",q:"The functional group in alcohols is:",o:["-COOH","-OH","-NH₂","-CHO"],a:1,e:"Alcohols contain a hydroxyl (-OH) group."},
+{t:"Gas Laws",q:"At constant temperature, decreasing the volume of a gas tends to:",o:["decrease pressure","increase pressure","leave pressure always unchanged","remove particles"],a:1,e:"Boyle's law: pressure is inversely proportional to volume at constant temperature."}
+],
+"Physics":[
+{t:"Mechanics",q:"A car travels 150 m in 10 s. Its average speed is:",o:["10 m/s","15 m/s","20 m/s","1500 m/s"],a:1,e:"Speed = distance ÷ time = 150 ÷ 10 = 15 m/s."},
+{t:"Energy",q:"Kinetic energy is calculated using:",o:["mv","½mv²","mgh","F/A"],a:1,e:"Kinetic energy = 1/2 × mass × speed²."},
+{t:"Electricity",q:"The SI unit of electric current is the:",o:["volt","ohm","ampere","watt"],a:2,e:"Electric current is measured in amperes (A)."},
+{t:"Waves",q:"Wave speed equals:",o:["frequency ÷ wavelength","frequency × wavelength","wavelength ÷ frequency","amplitude × time"],a:1,e:"v = fλ."},
+{t:"Forces",q:"The resultant force on an object moving at constant velocity is:",o:["zero","equal to its mass","always upward","always increasing"],a:0,e:"Constant velocity means no acceleration, so resultant force is zero."},
+{t:"Electricity",q:"Potential difference is measured using a:",o:["ammeter","voltmeter","thermometer","barometer"],a:1,e:"A voltmeter measures potential difference."},
+{t:"Heat",q:"Energy transferred because of a temperature difference is:",o:["power","heat","mass","momentum"],a:1,e:"Heat is energy transferred due to temperature difference."},
+{t:"Optics",q:"A plane mirror forms an image that is:",o:["real and inverted","virtual and upright","real and enlarged","always diminished"],a:1,e:"A plane mirror forms a virtual, upright image of equal size."},
+{t:"Mechanics",q:"Acceleration is the rate of change of:",o:["distance","speed only","velocity","mass"],a:2,e:"Acceleration is change in velocity per unit time."},
+{t:"Energy",q:"Gravitational potential energy near Earth's surface is:",o:["½mv²","mgh","Fd/t","VI"],a:1,e:"GPE = mass × gravitational field strength × height."}
+],
+"Economics":[
+{t:"Scarcity",q:"The basic economic problem exists because:",o:["resources are unlimited","wants are limited","resources are scarce relative to wants","money has no value"],a:2,e:"Scarcity means limited resources cannot satisfy all human wants."},
+{t:"Demand",q:"Other things equal, a fall in price usually causes quantity demanded to:",o:["fall","rise","stay fixed","become zero"],a:1,e:"The law of demand predicts an inverse relationship between price and quantity demanded."},
+{t:"Supply",q:"A subsidy to producers is most likely to:",o:["reduce supply","increase supply","eliminate demand","raise scarcity automatically"],a:1,e:"A subsidy lowers effective production costs and tends to increase supply."},
+{t:"Inflation",q:"Inflation is best defined as:",o:["a sustained rise in the general price level","a fall in one product's price","higher output only","lower tax rates"],a:0,e:"Inflation is a sustained increase in the general level of prices."},
+{t:"Opportunity Cost",q:"Opportunity cost is:",o:["the money price only","the next best alternative forgone","all alternatives added together","a government tax"],a:1,e:"It is the value of the next best option sacrificed when a choice is made."},
+{t:"Market Structure",q:"A market with one dominant seller is a:",o:["perfect competition","monopoly","duopoly only","labour market"],a:1,e:"A monopoly has a single seller dominating supply."},
+{t:"National Income",q:"GDP measures the value of final goods and services produced:",o:["by citizens anywhere","within a country over a period","only by government","only for export"],a:1,e:"GDP focuses on production within a country's borders over a period."},
+{t:"Unemployment",q:"Structural unemployment can result from:",o:["workers' skills no longer matching available jobs","people changing jobs briefly","seasonal farming only","higher birth rates alone"],a:0,e:"Structural unemployment arises from longer-term mismatch between skills/location and job demand."},
+{t:"Public Finance",q:"A tax charged as a percentage of income is:",o:["direct tax","subsidy","transfer payment","quota"],a:0,e:"Income tax is a direct tax paid by individuals or firms to government."},
+{t:"Exchange Rates",q:"If a currency depreciates, exports may become:",o:["more expensive to foreign buyers","cheaper to foreign buyers","illegal","unchanged in every case"],a:1,e:"A weaker currency can reduce the foreign-currency price of exports."}
+]};
+
+const readiness={"Mathematics":62,"English Language":66,"Biology":78,"Chemistry":71,"Physics":58,"Economics":54};
+const subjectOrder=Object.keys(bank);
+const countryNotes={
+"Sierra Leone":"WASSCE practice profile • English oral component varies by member country.",
+"Ghana":"WASSCE practice profile • Use country-specific official guidance for current paper details.",
+"Nigeria":"WASSCE practice profile • 2026–27 Nigeria entry rules list English Language and General Mathematics as current core subjects.",
+"The Gambia":"WASSCE practice profile • Use country-specific official guidance for current paper details.",
+"Liberia":"WASSCE practice profile • English oral component varies by member country."
+};
+let state=null, clock=null;
+
+function pctColor(v){return v>=75?"green":v>=60?"gold":"clay"}
+function renderSubjects(){
+ const el=document.getElementById("subjectCards");
+ el.innerHTML=subjectOrder.map(s=>`<div class="subject" onclick="subjectStart('${s.replace(/'/g,"\\'")}')">
+ <strong>${s}</strong><div class="row"><span class="small">${readiness[s]}% ready</span><span class="dot ${pctColor(readiness[s])}"></span></div>
+ <div class="bar"><span style="width:${readiness[s]}%"></span></div></div>`).join("");
+ document.getElementById("todayQueue").innerHTML=`
+ <p><strong>1. Economics</strong><br><span class="small">10-question scarcity + demand repair • highest return</span></p>
+ <p><strong>2. Physics</strong><br><span class="small">Mechanics diagnostic</span></p>
+ <p><strong>3. Mathematics</strong><br><span class="small">Algebra retest</span></p>`;
+}
+function init(){
+ const sel=document.getElementById("subject");
+ subjectOrder.forEach(s=>sel.add(new Option(s,s)));
+ document.getElementById("country").onchange=()=>document.getElementById("countryNote").textContent=countryNotes[document.getElementById("country").value];
+ document.getElementById("country").onchange();
+ renderSubjects(); renderMap(); renderHistory(); applyProfile();
+}
+function showView(name,btn){
+ ["desk","learn","practice","mocks","skills","analytics","planner","map","progress","schools"].forEach(v=>{
+   const el=document.getElementById(v+"View"); if(el) el.classList.toggle("hidden",v!==name);
+ });
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+ if(btn) btn.classList.add("active");
+ if(name==="progress") renderHistory();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function subjectStart(s){showView("practice");document.getElementById("subject").value=s;document.getElementById("mode").value="diagnostic";}
+function startMock(subject){
+ showView("practice");
+ document.getElementById("subject").value=subject;
+ document.getElementById("mode").value="exam";
+ document.getElementById("length").value="10";
+ startExam();
+}
+function startWrongAnswers(){
+ showView("practice");
+ document.getElementById("subject").value="Mathematics";
+ document.getElementById("mode").value="weak";
+ document.getElementById("length").value="5";
+ startExam();
+}
+function buildSmartMock(){
+ const focus=document.getElementById("mockFocus").value;
+ const subject=document.getElementById("mockSubject").value;
+ const length=document.getElementById("mockLength").value;
+ const box=document.getElementById("mockBuilderResult");
+ box.innerHTML=`<strong>Mock ready:</strong> ${subject} • ${length} • ${focus}. In production, Sabi would choose questions using your mastery, previous errors and pace history.`;
+ box.classList.remove("hidden");
+}
+function teacherBuild(){
+ const box=document.getElementById("teacherBuildResult");
+ box.innerHTML="<strong>Class test generated:</strong> 15 mixed-difficulty questions from the selected syllabus area, ready to assign online or export for print.";
+ box.classList.remove("hidden");
+}
+function rebalancePlan(){
+ const el=document.getElementById("weekPlan");
+ if(el) el.insertAdjacentHTML("afterbegin",`<div class="notice" style="grid-column:1/-1"><strong>Plan rebalanced.</strong> Economics and Algebra moved earlier because they currently offer the highest expected mark gain.</div>`);
+}
+function quickStart(){subjectStart("Mathematics");startExam();}
+function sampleQuestions(subject,n,mode){
+ let arr=[...bank[subject]];
+ if(mode==="weak"){
+   const history=safeJson("sabiHistory",[]);
+   const weak=(history.filter(h=>h.subject===subject).flatMap(h=>h.weak||[]));
+   if(weak.length){const f=arr.filter(q=>weak.includes(q.t)); if(f.length>=3) arr=f.concat(arr.filter(q=>!weak.includes(q.t)));}
+ }
+ arr.sort(()=>Math.random()-.5);
+ return arr.slice(0,Math.min(n,arr.length));
+}
+function startExam(){
+ clearInterval(clock);
+ const subject=document.getElementById("subject").value, mode=document.getElementById("mode").value, n=+document.getElementById("length").value;
+ state={subject,mode,country:document.getElementById("country").value,qs:sampleQuestions(subject,n,mode),i:0,answers:[],started:Date.now(),questionStarted:Date.now(),times:[],flags:[],timeLeft:n*72};
+ document.getElementById("examCard").classList.remove("hidden");
+ document.getElementById("resultCard").classList.add("hidden");
+ if(mode==="exam"||mode==="diagnostic"){
+   clock=setInterval(()=>{state.timeLeft--;renderExamMeta();if(state.timeLeft<=0)finishExam();},1000);
+ }
+ renderQuestion();
+ document.getElementById("examCard").scrollIntoView({behavior:"smooth"});
+}
+function renderExamMeta(){
+ const qn=state.i+1,total=state.qs.length;
+ document.getElementById("examMeta").textContent=`${state.country} • ${state.subject} • Q${qn}/${total}`;
+ document.getElementById("progressBar").style.width=`${(state.i/total)*100}%`;
+ const t=document.getElementById("timer");
+ if(state.mode==="exam"||state.mode==="diagnostic"){t.textContent=`${Math.floor(state.timeLeft/60)}:${String(state.timeLeft%60).padStart(2,"0")}`;} else t.textContent="Untimed";
+}
+function renderQuestion(){
+ renderExamMeta();
+ const q=state.qs[state.i];
+ document.getElementById("topicBadge").textContent=q.t;
+ const fb=document.getElementById("flagBtn"); if(fb) fb.textContent=state.flags[state.i]?"★ Flagged":"☆ Flag";
+ document.getElementById("questionText").textContent=q.q;
+ const opts=document.getElementById("options"); opts.innerHTML="";
+ q.o.forEach((x,i)=>{const b=document.createElement("button");b.className="option";b.textContent=`${String.fromCharCode(65+i)}. ${x}`;b.onclick=()=>choose(i,b);opts.appendChild(b);});
+ document.getElementById("feedback").classList.add("hidden");
+ document.getElementById("nextBtn").classList.add("hidden");
+ state.questionStarted=Date.now();
+}
+function toggleFlag(){
+ if(!state)return;
+ state.flags[state.i]=!state.flags[state.i];
+ const b=document.getElementById("flagBtn");
+ b.textContent=state.flags[state.i]?"★ Flagged":"☆ Flag";
+}
+function choose(idx,btn){
+ if(state.answers[state.i]!==undefined)return;
+ const q=state.qs[state.i]; state.answers[state.i]=idx;
+ state.times[state.i]=Math.max(1,Math.round((Date.now()-state.questionStarted)/1000));
+ [...document.getElementById("options").children].forEach(b=>b.disabled=true);
+ const learn=state.mode==="learning";
+ if(idx===q.a){btn.classList.add("correct");}
+ else{btn.classList.add("wrong");document.getElementById("options").children[q.a].classList.add("correct");}
+ if(learn){
+   const f=document.getElementById("feedback");f.innerHTML=`<strong>${idx===q.a?"Correct":"Not quite"}.</strong> ${q.e}`;f.classList.remove("hidden");
+ }
+ const n=document.getElementById("nextBtn");n.textContent=state.i===state.qs.length-1?"Finish":"Next";n.classList.remove("hidden");
+}
+function nextQuestion(){if(state.i<state.qs.length-1){state.i++;renderQuestion();}else finishExam();}
+function quitExam(){clearInterval(clock);document.getElementById("examCard").classList.add("hidden");state=null;}
+function grade(p){if(p>=75)return"A1";if(p>=70)return"B2";if(p>=65)return"B3";if(p>=60)return"C4";if(p>=55)return"C5";if(p>=50)return"C6";if(p>=45)return"D7";if(p>=40)return"E8";return"F9";}
+function finishExam(){
+ if(!state)return; clearInterval(clock);
+ const topic={}; let right=0;
+ state.qs.forEach((q,i)=>{topic[q.t]??={r:0,n:0};topic[q.t].n++;if(state.answers[i]===q.a){right++;topic[q.t].r++;}});
+ const pct=Math.round(100*right/state.qs.length), g=grade(pct);
+ const weak=Object.entries(topic).filter(([k,v])=>v.r/v.n<.7).map(([k])=>k);
+ const strongest=Object.entries(topic).sort((a,b)=>(b[1].r/b[1].n)-(a[1].r/a[1].n))[0]?.[0]||"—";
+ const result=document.getElementById("resultCard");
+ result.innerHTML=`<div class="resultHero"><div class="grade">${g}</div><div><h2 style="margin:0">${pct}%</h2><div class="small">${right}/${state.qs.length} correct</div></div></div>
+ <div class="statgrid">
+ <div class="stat"><span class="small">Strongest</span><strong>${strongest}</strong></div>
+ <div class="stat"><span class="small">Repair first</span><strong>${weak[0]||"No urgent gap"}</strong></div>
+ <div class="stat"><span class="small">Avg pace</span><strong>${state.times.length?Math.round(state.times.reduce((a,b)=>a+b,0)/state.times.length):"—"}s</strong></div>
+ <div class="stat"><span class="small">Flagged</span><strong>${state.flags.filter(Boolean).length}</strong></div>
+ </div>
+ <h3 style="margin-top:22px">Topic evidence</h3>
+ <p class="small">Sabi combines correctness with pace. A topic can therefore be accurate but still need fluency work.</p>
+ ${Object.entries(topic).map(([k,v])=>`<p><span class="badge">${k}</span> ${v.r}/${v.n} ${v.r/v.n>=.7?"✓":"— repair"}</p>`).join("")}
+ <div class="feedback"><strong>Your next move:</strong> ${weak.length?`Repair ${weak.slice(0,2).join(" and ")} before another full sitting. Sabi would prioritise these because they currently offer the clearest route to extra marks.`:"Strong sitting. Retest after spacing your revision to check that the knowledge holds under pressure."}</div>
+ <div class="notice" style="margin:12px 0">
+   <strong>Sabi diagnosis:</strong> ${pct>=75
+     ? "You are currently performing in an A1-range sample. The next priority is consistency across a longer, harder paper."
+     : pct>=60
+     ? "You are around the C4–B3 range in this sample. Closing one or two recurring topic gaps could move the grade quickly."
+     : pct>=50
+     ? "You are currently around credit level. Focused repair is more useful now than simply sitting more full papers."
+     : "You are below credit level in this sample. Build topic accuracy first, then return to full exam conditions."}
+ </div>
+ <div class="row" style="justify-content:flex-start;flex-wrap:wrap">
+   <button class="primary" onclick="startWeak('${state.subject.replace(/'/g,"\\'")}')">Build weak-topic paper</button>
+   <button class="secondary" onclick="subjectStart('${state.subject.replace(/'/g,"\\'")}')">Retake diagnostic</button>
+ </div>`;
+ result.classList.remove("hidden"); document.getElementById("examCard").classList.add("hidden");
+ const history=safeJson("sabiHistory",[]);
+ history.unshift({date:new Date().toISOString(),country:state.country,subject:state.subject,mode:state.mode,pct,grade:g,weak});
+ localStorage.setItem("sabiHistory",JSON.stringify(history.slice(0,30)));
+ readiness[state.subject]=Math.round((readiness[state.subject]*2+pct)/3);
+ document.getElementById("heroReadiness").textContent=Math.round(Object.values(readiness).reduce((a,b)=>a+b,0)/subjectOrder.length)+"%";
+ document.getElementById("nextMove").textContent=weak.length?`${state.subject}: repair ${weak[0]} next.`:`${state.subject}: strong sitting — schedule a retest.`;
+ renderSubjects(); renderMap(); renderHistory(); state=null;
+ result.scrollIntoView({behavior:"smooth"});
+}
+function startWeak(subject){document.getElementById("subject").value=subject;document.getElementById("mode").value="weak";startExam();}
+function renderMap(){
+ const mk=(topics,subject)=>topics.map(t=>{let s=readiness[subject]+((t.charCodeAt(0)%17)-8);s=Math.max(35,Math.min(92,s));return `<div class="mastery"><div><span class="dot ${pctColor(s)}"></span><strong>${t}</strong><div class="small">${s>=75?"Mastered":s>=60?"Developing":"Needs repair"}</div></div><strong>${s}%</strong></div>`}).join("");
+ document.getElementById("mathMap").innerHTML=mk(["Algebra","Number","Geometry","Statistics","Probability"],"Mathematics");
+ document.getElementById("bioMap").innerHTML=mk(["Cell Biology","Genetics","Human Physiology","Ecology","Plant Biology"],"Biology");
+}
+function renderHistory(){
+ const h=safeJson("sabiHistory",[]), el=document.getElementById("history");
+ if(!h.length){el.innerHTML=`<p class="small">No completed sittings yet. Finish a practice set and it will appear here.</p>`;return;}
+ el.innerHTML=`<table class="table"><tr><th>Date</th><th>Subject</th><th>Mode</th><th>Score</th><th>Grade</th></tr>${h.map(x=>`<tr><td>${new Date(x.date).toLocaleDateString()}</td><td>${x.subject}</td><td>${x.mode}</td><td>${x.pct}%</td><td><strong>${x.grade}</strong></td></tr>`).join("")}</table>`;
+}
+function clearProgress(){localStorage.removeItem("sabiHistory");renderHistory();}
+init();
+</script>
+</body>
+</html>

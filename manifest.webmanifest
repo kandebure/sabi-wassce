@@ -1,0 +1,10 @@
+{
+  "name": "Sabi WASSCE",
+  "short_name": "Sabi",
+  "description": "Personalised WASSCE revision, practice, mock exams and readiness tracking.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6f1e8",
+  "theme_color": "#123f31",
+  "icons": []
+}
